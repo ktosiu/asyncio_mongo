@@ -1,0 +1,14 @@
+Asyncio Mongo
+Copyright (c) 2014 Atlassian Software Systems Pty Ltd - Apache 2.0 License: http://www.apache.org/licenses/LICENSE-2.0
+
+Based On:
+TxMongo - Apache 2.0 License: http://www.apache.org/licenses/LICENSE-2.0
+https://github.com/fiorix/mongo-async-python-driver
+
+Makes use of:
+asyncio_redis - https://github.com/jonathanslenders/asyncio-redis/blob/master/LICENSE.txt
+https://github.com/jonathanslenders/asyncio-redis
+
+PyMongo - http://www.apache.org/licenses/LICENSE-2.0
+http://github.com/mongodb/mongo-python-driver
+
