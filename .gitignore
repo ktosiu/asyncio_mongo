@@ -1,0 +1,13 @@
+.DS_Store
+*.swp
+._*
+*.pyc
+*.cache
+_trial_temp/
+*.pid
+*.iml
+*.ipr
+*.iws
+.idea
+venv
+
