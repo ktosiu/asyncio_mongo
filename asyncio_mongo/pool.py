@@ -12,12 +12,12 @@ class Pool:
     Pool of connections. Each
     Takes care of setting up the connection and connection pooling.
 
-    When poolsize > 1 and some connections are in use because of transactions
+    When pool_size > 1 and some connections are in use because of transactions
     or blocking requests, the other are preferred.
 
     ::
 
-        pool = yield from Pool.create(host='localhost', port=6379, poolsize=10)
+        pool = yield from Pool.create(host='localhost', port=6379, pool_size=10)
         result = yield from connection.set('key', 'value')
     """
 
@@ -38,19 +38,19 @@ class Pool:
 
     @classmethod
     @asyncio.coroutine
-    def create(cls, host='localhost', port=6379, loop=None, password=None, db=0, poolsize=1, auto_reconnect=True):
+    def create(cls, host='localhost', port=6379, loop=None, password=None, db=0, pool_size=1, auto_reconnect=True):
         """
         Create a new connection instance.
         """
         self = cls()
         self._host = host
         self._port = port
-        self._poolsize = poolsize
+        self._pool_size = pool_size
 
         # Create connections
         self._connections = []
 
-        for i in range(poolsize):
+        for i in range(pool_size):
             connection_class = cls.get_connection_class()
             connection = yield from connection_class.create(host=host, port=port, loop=loop,
                             password=password, db=db, auto_reconnect=auto_reconnect)
@@ -59,10 +59,10 @@ class Pool:
         return self
 
     def __repr__(self):
-        return 'Pool(host=%r, port=%r, poolsize=%r)' % (self._host, self._port, self._poolsize)
+        return 'Pool(host=%r, port=%r, pool_size=%r)' % (self._host, self._port, self._poolsize)
 
     @property
-    def poolsize(self):
+    def pool_size(self):
         """ Number of parallel connections in the pool."""
         return self._poolsize
 
@@ -80,6 +80,10 @@ class Pool:
         """
         return sum([ 1 for c in self._connections if c.protocol.is_connected ])
 
+    def close(self):
+        for conn in self._connections:
+            conn.disconnect()
+
     def _get_free_connection(self):
         """
         Return the next protocol instance that's not in use.
@@ -94,7 +98,7 @@ class Pool:
 
     def _shuffle_connections(self):
         """
-        'shuffle' protocols. Make sure that we devide the load equally among the protocols.
+        'shuffle' protocols. Make sure that we divide the load equally among the protocols.
         """
         self._connections = self._connections[1:] + self._connections[:1]
 
@@ -103,10 +107,14 @@ class Pool:
         Proxy to a protocol. (This will choose a protocol instance that's not
         busy in a blocking request or transaction.)
         """
+
+        if 'close' == name:
+            return self.close
+
         connection = self._get_free_connection()
 
         if connection:
             return getattr(connection, name)
         else:
             raise NoAvailableConnectionsInPoolError('No available connections in the pool: size=%s, in_use=%s, connected=%s' % (
-                                self.poolsize, self.connections_in_use, self.connections_connected))
+                                self.pool_size, self.connections_in_use, self.connections_connected))

@@ -48,6 +48,11 @@ class Connection:
 
         return connection
 
+    @asyncio.coroutine
+    def disconnect(self):
+        if self.transport:
+            return self.transport.close()
+
     @property
     def transport(self):
         """ The transport instance that the protocol is currently using. """

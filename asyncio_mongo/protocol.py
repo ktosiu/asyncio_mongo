@@ -27,7 +27,7 @@ _ZERO = b"\x00\x00\x00\x00"
 
 
 class _MongoQuery(object):
-    def __init__(self, id, collection, limit):
+    def    __init__(self, id, collection, limit):
         self.id = id
         self.limit = limit
         self.collection = collection
