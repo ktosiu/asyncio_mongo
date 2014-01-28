@@ -12,11 +12,16 @@ from distutils.errors import CCompilerError
 from distutils.errors import DistutilsPlatformError, DistutilsExecError
 from distutils.core import Extension
 
-requirements = ["asyncio"]
+
+requirements = []
 try:
     import xml.etree.ElementTree
 except ImportError:
     requirements.append("elementtree")
+try:
+    import asyncio
+except ImportError:
+    requirements.append("asyncio")
 
 
 if sys.platform == 'win32' and sys.version_info > (2, 6):
@@ -69,11 +74,16 @@ although they do result in significant speed improvements.
 c_ext = Feature(
     "optional C extension",
     standard=True,
-    ext_modules=[Extension('txmongo._pymongo._cbson',
-                            include_dirs=['txmongo/_pymongo'],
-                            sources=['txmongo/_pymongo/_cbsonmodule.c',
-                                     'txmongo/_pymongo/time_helpers.c',
-                                     'txmongo/_pymongo/encoding_helpers.c'])])
+    ext_modules=[Extension('asyncio_mongo._bson._cbson',
+                            include_dirs=['asyncio_mongo/_bson'],
+                            sources=['asyncio_mongo/_bson/_cbsonmodule.c',
+                                     'asyncio_mongo/_bson/time64.c',
+                                     'asyncio_mongo/_bson/buffer.c',
+                                     'asyncio_mongo/_bson/encoding_helpers.c']),
+                 Extension('asyncio_mongo._pymongo._cmessage',
+                           include_dirs=['bson'],
+                           sources=['asyncio_mongo._pymongo/_cmessagemodule.c',
+                                    'asyncio_mongo/_bson/buffer.c'])])
 
 if "--no_ext" in sys.argv:
     sys.argv = [x for x in sys.argv if x != "--no_ext"]
@@ -83,13 +93,13 @@ else:
 
 setup(
     name="asyncio-mongo",
-    version="0.1.0",
+    version="0.1-dev",
     description="Asynchronous Python 3.3+ driver for MongoDB <http://www.mongodb.org>",
     author="Alexandre Fiori, Don Brown",
     author_email="mrdon@twdata.org",
     url="https://bitbucket.org/mrdon/asyncio-mongo",
     keywords=["mongo", "mongodb", "pymongo", "gridfs", "asyncio_mongo", "asyncio"],
-    packages=["asyncio_mongo", "asyncio_mongo._pymongo", "asyncio_mongo._gridfs", "asyncio_mongo._bson"],
+    packages=["asyncio_mongo", "asyncio_mongo._pymongo", "asyncio_mongo._bson"],
     install_requires=requirements,
     features=features,
     license="Apache License, Version 2.0",

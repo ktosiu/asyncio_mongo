@@ -10,4 +10,6 @@ _trial_temp/
 *.iws
 .idea
 venv
-
+build
+dist
+*.egg-info

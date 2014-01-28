@@ -15,6 +15,18 @@ Docs and examples
 =================
 There are some examples in the *examples/* directory.
 
+Features
+========
+- Works for the asyncio (PEP3156) event loop
+- No dependencies
+- Connection pooling
+- Automatic conversion from unicode (Python) to bytes (inside Redis.)
+- Bytes and str protocols.
+- Completely tested
+- Blocking calls and transactions supported
+- Streaming of some multi bulk replies
+- Pubsub support
+
 Credits
 =======
 Thanks to (in no particular order):
