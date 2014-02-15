@@ -92,8 +92,8 @@ else:
     features = {"c-ext": c_ext}
 
 setup(
-    name="asyncio-mongo",
-    version="0.1-dev",
+    name="asyncio_mongo",
+    version="0.1",
     description="Asynchronous Python 3.3+ driver for MongoDB <http://www.mongodb.org>",
     author="Alexandre Fiori, Don Brown",
     author_email="mrdon@twdata.org",
