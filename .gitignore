@@ -2,6 +2,7 @@
 *.swp
 ._*
 *.pyc
+*.so
 *.cache
 _trial_temp/
 *.pid
