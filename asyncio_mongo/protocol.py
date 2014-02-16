@@ -50,7 +50,7 @@ class MongoProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
         self._is_connected = True
-        logger.log(logging.INFO, 'Mongo connection made with %')
+        logger.log(logging.INFO, 'Mongo connection made')
 
     def connection_lost(self, exc):
         self._is_connected = False
@@ -61,6 +61,11 @@ class MongoProtocol(asyncio.Protocol):
             f.set_exception(ConnectionLostError(exc))
 
         logger.log(logging.INFO, 'Mongo connection lost')
+
+    @property
+    def is_connected(self):
+        """ True when the underlying transport is connected. """
+        return self._is_connected
 
     def data_received(self, data):
         while self.__waiting_header:

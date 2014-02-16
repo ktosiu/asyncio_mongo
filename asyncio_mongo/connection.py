@@ -1,8 +1,8 @@
+import logging
+from asyncio_mongo.log import logger
 from asyncio_mongo.database import Database
 from .protocol import MongoProtocol
-from asyncio.log import logger
 import asyncio
-import logging
 
 __all__ = ['Connection']
 
@@ -24,7 +24,7 @@ class Connection:
 
     @classmethod
     @asyncio.coroutine
-    def create(cls, host='localhost', port=6379, loop=None, password=None, db=0, auto_reconnect=True):
+    def create(cls, host='localhost', port=27017, loop=None, auto_reconnect=True):
         connection = cls()
 
         connection.host = host
@@ -33,7 +33,7 @@ class Connection:
         connection._retry_interval = .5
 
         # Create protocol instance
-        protocol_factory = type('MongoProtocol', (cls.protocol,), { 'password': password, 'db': db })
+        protocol_factory = type('MongoProtocol', (cls.protocol,), {})
 
         if auto_reconnect:
             class protocol_factory(protocol_factory):

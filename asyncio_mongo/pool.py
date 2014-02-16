@@ -38,22 +38,22 @@ class Pool:
 
     @classmethod
     @asyncio.coroutine
-    def create(cls, host='localhost', port=6379, loop=None, password=None, db=0, pool_size=1, auto_reconnect=True):
+    def create(cls, host='localhost', port=27017, loop=None, poolsize=1, auto_reconnect=True):
         """
-        Create a new connection instance.
+        Create a new pool instance.
         """
         self = cls()
         self._host = host
         self._port = port
-        self._pool_size = pool_size
+        self._pool_size = poolsize
 
         # Create connections
         self._connections = []
 
-        for i in range(pool_size):
+        for i in range(poolsize):
             connection_class = cls.get_connection_class()
             connection = yield from connection_class.create(host=host, port=port, loop=loop,
-                            password=password, db=db, auto_reconnect=auto_reconnect)
+                                                            auto_reconnect=auto_reconnect)
             self._connections.append(connection)
 
         return self
@@ -67,18 +67,11 @@ class Pool:
         return self._poolsize
 
     @property
-    def connections_in_use(self):
-        """
-        Return how many protocols are in use.
-        """
-        return sum([ 1 for c in self._connections if c.protocol.in_use ])
-
-    @property
     def connections_connected(self):
         """
         The amount of open TCP connections.
         """
-        return sum([ 1 for c in self._connections if c.protocol.is_connected ])
+        return sum([1 for c in self._connections if c.protocol.is_connected])
 
     def close(self):
         for conn in self._connections:
@@ -93,7 +86,7 @@ class Pool:
         self._shuffle_connections()
 
         for c in self._connections:
-            if c.protocol.is_connected and not c.protocol.in_use:
+            if c.protocol.is_connected:
                 return c
 
     def _shuffle_connections(self):
@@ -116,5 +109,5 @@ class Pool:
         if connection:
             return getattr(connection, name)
         else:
-            raise NoAvailableConnectionsInPoolError('No available connections in the pool: size=%s, in_use=%s, connected=%s' % (
-                                self.pool_size, self.connections_in_use, self.connections_connected))
+            raise NoAvailableConnectionsInPoolError('No available connections in the pool: size=%s, connected=%s' % (
+                                                    self.pool_size, self.connections_connected))
