@@ -14,11 +14,10 @@
 # limitations under the License.
 from asyncio_mongo._bson import SON
 
-from asyncio_mongo._pymongo import helpers
 from asyncio_mongo.collection import Collection
 from asyncio import coroutine
 from asyncio_mongo.exceptions import ErrorReply
-from pymongo import auth
+from asyncio_mongo._pymongo import auth
 
 
 class Database(object):
