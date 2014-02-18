@@ -18,6 +18,7 @@ from asyncio_mongo._pymongo import helpers
 from asyncio_mongo.collection import Collection
 from asyncio import coroutine
 from asyncio_mongo.exceptions import ErrorReply
+from pymongo import auth
 
 
 class Database(object):
@@ -100,7 +101,7 @@ class Database(object):
     @coroutine
     def authenticate_with_nonce(self, result, name, password):
         nonce = result['nonce']
-        key = helpers._auth_key(nonce, name, password)
+        key = auth._auth_key(nonce, name, password)
 
         # hacky because order matters
         auth_command = SON(authenticate=1)
