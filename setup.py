@@ -93,7 +93,7 @@ else:
 
 setup(
     name="asyncio_mongo",
-    version="0.1",
+    version="0.2",
     description="Asynchronous Python 3.3+ driver for MongoDB <http://www.mongodb.org>",
     author="Alexandre Fiori, Don Brown",
     author_email="mrdon@twdata.org",
