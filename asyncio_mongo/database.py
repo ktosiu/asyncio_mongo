@@ -94,8 +94,8 @@ class Database(object):
             raise TypeError("password must be an instance of str")
 
         # First get the nonce
-        result = yield self["$cmd"].find_one({"getnonce": 1})
-        return (yield self.authenticate_with_nonce(result, name, password))
+        result = yield from self["$cmd"].find_one({"getnonce": 1})
+        return (yield from self.authenticate_with_nonce(result, name, password))
 
     @coroutine
     def authenticate_with_nonce(self, result, name, password):
