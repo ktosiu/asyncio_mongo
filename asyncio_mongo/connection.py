@@ -89,7 +89,7 @@ class Connection:
                 yield from loop.create_connection(lambda: self.protocol, self.host, self.port)
                 self._reset_retry_interval()
                 for name, auth in self._authenticators.items():
-                    yield from auth.authenticate(Database(self, name))
+                    yield from auth.authenticate(Database(self.protocol, name))
                     logger.log(logging.INFO, 'Authenticated to database {name}'.format(name=name))
                 return
             except OSError:
