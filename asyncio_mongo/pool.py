@@ -69,7 +69,7 @@ class Pool:
 
         for i in range(poolsize):
             connection_class = cls.get_connection_class()
-            connection = yield from connection_class.create(host=host, port=port, db=db, username=username,
+            connection = yield from connection_class.create(host=self._host, port=self._port, db=db, username=username,
                                                             password=password, loop=loop,
                                                             auto_reconnect=auto_reconnect)
             self._connections.append(connection)
