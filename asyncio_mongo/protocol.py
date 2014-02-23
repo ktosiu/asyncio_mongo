@@ -16,6 +16,7 @@ import logging
 
 import struct
 import asyncio
+from asyncio_mongo.database import Database
 from asyncio_mongo.exceptions import ConnectionLostError
 import asyncio_mongo._bson as bson
 from asyncio_mongo.log import logger
@@ -27,7 +28,7 @@ _ZERO = b"\x00\x00\x00\x00"
 
 
 class _MongoQuery(object):
-    def    __init__(self, id, collection, limit):
+    def __init__(self, id, collection, limit):
         self.id = id
         self.limit = limit
         self.collection = collection
@@ -36,21 +37,29 @@ class _MongoQuery(object):
 
 
 class MongoProtocol(asyncio.Protocol):
-    def __init__(self):
+    def __init__(self, connection_lost_callback=None, authenticators=None):
         self.__id = 0
         self.__buffer = b""
         self.__queries = {}
         self.__datalen = None
         self.__response = 0
         self.__waiting_header = True
+        self.__connection_lost_callback = connection_lost_callback
         self._pipelined_calls = set() # Set of all the pipelined calls.
         self.transport = None
         self._is_connected = False
 
+        self.__authenticators = authenticators or {}
+
     def connection_made(self, transport):
         self.transport = transport
+
         self._is_connected = True
         logger.log(logging.INFO, 'Mongo connection made')
+
+        # for name, auth in self.__authenticators.iter_items():
+        #     yield from auth(Database(self, name))
+        #     logger.log(logging.INFO, 'Authenticated to database {name}'.format(name=name))
 
     def connection_lost(self, exc):
         self._is_connected = False
@@ -61,6 +70,9 @@ class MongoProtocol(asyncio.Protocol):
             f.set_exception(ConnectionLostError(exc))
 
         logger.log(logging.INFO, 'Mongo connection lost')
+
+        if self.__connection_lost_callback:
+            self.__connection_lost_callback(exec)
 
     @property
     def is_connected(self):

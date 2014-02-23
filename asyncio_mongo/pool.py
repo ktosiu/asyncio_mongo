@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from .connection import Connection
 from .exceptions import NoAvailableConnectionsInPoolError
 from .protocol import MongoProtocol
@@ -38,13 +39,29 @@ class Pool:
 
     @classmethod
     @asyncio.coroutine
-    def create(cls, host='localhost', port=27017, loop=None, poolsize=1, auto_reconnect=True):
+    def create(cls, host='localhost', port=27017, db=None, username=None, password=None, url=None, loop=None,
+               poolsize=1, auto_reconnect=True):
         """
         Create a new pool instance.
         """
         self = cls()
-        self._host = host
-        self._port = port
+
+        if url:
+            url = urlparse(url)
+
+            try:
+                db = url.path.replace('/', '')
+            except (AttributeError, ValueError):
+                raise Exception("Missing database name in URI")
+
+            self._host = url.hostname
+            self._port = url.port or 27017
+            username = url.username
+            password = url.password
+        else:
+            self._host = host
+            self._port = port
+
         self._pool_size = poolsize
 
         # Create connections
@@ -52,7 +69,8 @@ class Pool:
 
         for i in range(poolsize):
             connection_class = cls.get_connection_class()
-            connection = yield from connection_class.create(host=host, port=port, loop=loop,
+            connection = yield from connection_class.create(host=host, port=port, db=db, username=username,
+                                                            password=password, loop=loop,
                                                             auto_reconnect=auto_reconnect)
             self._connections.append(connection)
 
@@ -101,13 +119,10 @@ class Pool:
         busy in a blocking request or transaction.)
         """
 
-        if 'close' == name:
-            return self.close
-
         connection = self._get_free_connection()
 
         if connection:
             return getattr(connection, name)
         else:
             raise NoAvailableConnectionsInPoolError('No available connections in the pool: size=%s, connected=%s' % (
-                                                    self.pool_size, self.connections_connected))
+                                                    self._pool_size, self.connections_connected))
