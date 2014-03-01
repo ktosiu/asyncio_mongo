@@ -66,13 +66,13 @@ class MongoProtocol(asyncio.Protocol):
         self.transport = None
 
         # Raise exception on all waiting futures.
-        for f in self.__queries:
+        for f in self.__queries.values():
             f.set_exception(ConnectionLostError(exc))
 
         logger.log(logging.INFO, 'Mongo connection lost')
 
         if self.__connection_lost_callback:
-            self.__connection_lost_callback(exec)
+            self.__connection_lost_callback(exc)
 
     @property
     def is_connected(self):
