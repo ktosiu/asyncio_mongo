@@ -39,6 +39,14 @@ class TestMongoConnectionMethods(MongoTest):
         pool = asyncio_mongo.Pool.create(mongo_host, mongo_port, poolsize=2)
         self.assertTrue(inspect.isgenerator(pool))
         rapi = yield from pool
-        print('rapi %s' % rapi.__class__)
+        self.assertEqual(isinstance(rapi, asyncio_mongo.Pool), True)
+        rapi.close()
+
+    @async
+    def test_pool(self):
+        # MongoConnectionPool returns deferred, which gets MongoAPI
+        pool = asyncio_mongo.Pool.create(mongo_host, "%s,blah:333" % mongo_port, poolsize=2)
+        self.assertTrue(inspect.isgenerator(pool))
+        rapi = yield from pool
         self.assertEqual(isinstance(rapi, asyncio_mongo.Pool), True)
         rapi.close()
