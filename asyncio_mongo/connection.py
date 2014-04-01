@@ -31,13 +31,6 @@ class Connection:
 
         connection.host = host
 
-        # strip any additional hosts in the connection string for now
-        try:
-            if "," in port:
-                port = port[:port.find(',')]
-        except TypeError:
-            pass
-
         connection.port = port
         connection._loop = loop
         connection._retry_interval = .5

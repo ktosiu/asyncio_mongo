@@ -55,7 +55,19 @@ class Pool:
                 raise Exception("Missing database name in URI")
 
             self._host = url.hostname
-            self._port = url.port or 27017
+
+            try:
+                port = url.port
+            except ValueError:
+                port = url._hostinfo[1]
+                # strip any additional hosts in the connection string for now
+                try:
+                    if "," in port:
+                        port = port[:port.find(',')]
+                except TypeError:
+                    pass
+
+            self._port = port or 27017
             username = url.username
             password = url.password
         else:
