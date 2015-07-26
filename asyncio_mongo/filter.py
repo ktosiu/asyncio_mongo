@@ -51,6 +51,13 @@ def GEOHAYSTACK(keys):
     return _DIRECTION(keys, "geoHaystack")
 
 
+def HASHED(keys):
+    """
+
+    http://docs.mongodb.org/manual/core/index-hashed/
+    """
+    return _DIRECTION(keys, "hashed")
+
  
 class _QueryFilter(defaultdict):
     def __init__(self):
@@ -71,7 +78,7 @@ class _QueryFilter(defaultdict):
             for key, direction in index_list:
                 if not isinstance(key, str):
                     raise TypeError("Invalid %sing key: %s" % (name, repr(key)))
-                if direction not in (1, -1, "2d", "geoHaystack"):
+                if direction not in (1, -1, "2d", "geoHaystack", "hashed"):
                     raise TypeError("Invalid %sing direction: %s" % (name, direction))
                 self[operation] += tuple(((key, direction),))
         except Exception:
